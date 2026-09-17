@@ -4,6 +4,10 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/ElevenSolver/',
+  build: {
+    outDir: 'docs',
+  },
   plugins: [react()],
   test: {
     environment: 'node',
