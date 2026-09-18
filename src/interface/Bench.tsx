@@ -6,9 +6,11 @@ import { PlayerEditor } from './PlayerEditor';
 export function Bench({
   players,
   onPlayerChange,
+  onPlayerClick,
 }: {
   players: Player[];
   onPlayerChange: (p: Player) => void;
+  onPlayerClick: (p: Player) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: 'bench' });
 
@@ -18,7 +20,7 @@ export function Bench({
       <p className="panel__hint">{players.length} unplaced</p>
       <div className="bench__list">
         {players.map((p) => (
-          <div key={p.jerseyNumber} className="bench__row">
+          <div key={p.jerseyNumber} className="bench__row" onClick={() => onPlayerClick(p)}>
             <PlayerChip player={p} />
             <PlayerEditor player={p} onChange={onPlayerChange} />
           </div>

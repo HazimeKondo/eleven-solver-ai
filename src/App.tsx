@@ -8,6 +8,7 @@ import { Field } from './interface/Field';
 import { OpponentSelector } from './interface/OpponentSelector';
 import { ResultDisplay } from './interface/ResultDisplay';
 import { PlayerChip } from './interface/PlayerChip';
+import { PlayerModal } from './interface/PlayerModal';
 import { ZONE_IDS, zoneSection, ZONE_CAP } from './interface/types';
 import './App.css';
 
@@ -44,6 +45,7 @@ function App() {
   const [gk, setGk] = useState<Goalkeeper>(DEFAULT_GK);
   const [placements, setPlacements] = useState<Record<string, Player[]>>({});
   const [activePlayer, setActivePlayer] = useState<Player | null>(null);
+  const [modalPlayer, setModalPlayer] = useState<Player | null>(null);
   const [result, setResult] = useState<MatchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -117,6 +119,26 @@ function App() {
     setError(null);
   }
 
+  function handleMoveFromModal(zoneId: string | null) {
+    if (!modalPlayer) return;
+    const num = modalPlayer.jerseyNumber;
+    setPlacements((prev) => {
+      const next: Record<string, Player[]> = {};
+      for (const zid of ZONE_IDS) next[zid] = [...(prev[zid] ?? [])];
+      for (const zid of ZONE_IDS) {
+        next[zid] = next[zid].filter((p) => p.jerseyNumber !== num);
+      }
+      if (zoneId === null) return next;
+      const cap = ZONE_CAP(zoneId);
+      if (next[zoneId].length >= cap) return prev;
+      next[zoneId].push(modalPlayer);
+      return next;
+    });
+    setModalPlayer(null);
+    setResult(null);
+    setError(null);
+  }
+
   function handleResolve() {
     setError(null);
     setResult(null);
@@ -148,10 +170,10 @@ function App() {
         </header>
 
         <div className="app__body">
-          <Bench players={benchPlayers} onPlayerChange={updatePlayer} />
+          <Bench players={benchPlayers} onPlayerChange={updatePlayer} onPlayerClick={setModalPlayer} />
 
           <div className="app__fields">
-            <Field placements={placements} gk={gk} onGkChange={(newGk) => { setGk(newGk); setResult(null); setError(null); }} opponent={selectedOpponent ?? null} />
+            <Field placements={placements} gk={gk} onGkChange={(newGk) => { setGk(newGk); setResult(null); setError(null); }} opponent={selectedOpponent ?? null} onPlayerClick={setModalPlayer} />
           </div>
 
           <div className="app__right">
@@ -179,6 +201,16 @@ function App() {
           </div>
         ) : null}
       </DragOverlay>
+
+      {modalPlayer && (
+        <PlayerModal
+          player={modalPlayer}
+          placements={placements}
+          onMove={handleMoveFromModal}
+          onUpdate={updatePlayer}
+          onClose={() => setModalPlayer(null)}
+        />
+      )}
     </DndContext>
   );
 }
