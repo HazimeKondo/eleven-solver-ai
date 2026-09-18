@@ -387,6 +387,7 @@
   border-radius: 4px;
   user-select: none;
   cursor: grab;
+  touch-action: none;
 }
 
 .chip--compact {
