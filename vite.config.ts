@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/ElevenSolver/',
+  base: '/eleven-solver-ai/',
   build: {
     outDir: 'docs',
   },
