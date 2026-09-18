@@ -77,10 +77,11 @@ function OpponentShirts({ players }: { players: OpponentPlayer[] }) {
   );
 }
 
-function ZoneCell({ zoneId, players, opponentPlayers }: {
+function ZoneCell({ zoneId, players, opponentPlayers, onPlayerClick }: {
   zoneId: string;
   players: Player[];
   opponentPlayers: OpponentPlayer[];
+  onPlayerClick: (p: Player) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: zoneId });
   const cap = ZONE_CAP(zoneId);
@@ -95,7 +96,9 @@ function ZoneCell({ zoneId, players, opponentPlayers }: {
       <OpponentShirts players={opponentPlayers} />
       <div className="zone__players">
         {players.map((p) => (
-          <PlayerChip key={p.jerseyNumber} player={p} compact />
+          <span key={p.jerseyNumber} onClick={() => onPlayerClick(p)}>
+            <PlayerChip player={p} compact />
+          </span>
         ))}
       </div>
       <span className="zone__cap">{players.length}/{cap}</span>
@@ -103,11 +106,12 @@ function ZoneCell({ zoneId, players, opponentPlayers }: {
   );
 }
 
-export function Field({ placements, gk, onGkChange, opponent }: {
+export function Field({ placements, gk, onGkChange, opponent, onPlayerClick }: {
   placements: Record<string, Player[]>;
   gk: Goalkeeper;
   onGkChange: (gk: Goalkeeper) => void;
   opponent: OpponentCard | null;
+  onPlayerClick: (p: Player) => void;
 }) {
   const oppZoneMap = new Map<string, OpponentPlayer[]>();
   if (opponent) {
@@ -137,6 +141,7 @@ export function Field({ placements, gk, onGkChange, opponent }: {
               zoneId={zid}
               players={placements[zid] ?? []}
               opponentPlayers={oppZoneMap.get(zid) ?? []}
+              onPlayerClick={onPlayerClick}
             />
           ))}
         </div>
