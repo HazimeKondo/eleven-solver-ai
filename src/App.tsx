@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, type DragStartEvent, type DragEndEvent } from '@dnd-kit/core';
+import { DndContext, DragOverlay, PointerSensor, TouchSensor, useSensor, useSensors, type DragStartEvent, type DragEndEvent } from '@dnd-kit/core';
 import type { Goalkeeper, Player, SectionId, Team } from './domain/types';
 import { resolveMatch, availableOpponents } from './application';
 import type { MatchResult } from './domain/match';
@@ -53,7 +53,10 @@ function App() {
     opponents.find((o) => o.clubName === (opponents[0]?.clubName ?? ''))?.division ?? '',
   );
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 8 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
 
   const benchPlayers = useMemo(() => {
     const placed = new Set<number>();
